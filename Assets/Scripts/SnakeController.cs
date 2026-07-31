@@ -11,6 +11,9 @@ public class SnakeController : MonoBehaviour
     
     [SerializeField] private GameManagerScript  gameManager;
     
+    [SerializeField] private int startingBodyParts = 2;
+
+    
     private List<Transform> bodyParts = new List<Transform>();
     
     private Vector3 startPosition =  Vector3.zero;
@@ -23,8 +26,24 @@ public class SnakeController : MonoBehaviour
     [SerializeField] private GameObject bodyPartPrefab;
     
 
+    private void Awake()
+    {
+        GameReset();
+    }
+    
     private void Update()
     {
+        if (gameManager.IsGameOver())
+        {
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                GameReset();
+                gameManager.RestartGame();
+            }
+
+            return;
+        }
+        
         ReadInput();
 
         moveTimerCounter += Time.deltaTime;
@@ -68,6 +87,12 @@ public class SnakeController : MonoBehaviour
         {
             return;
         }
+        
+        if (currentDirection == Vector3.zero &&
+            nextDirection == Vector3.up)
+        {
+            return;
+        }
 
         if (nextDirection == Vector3.up &&
             currentDirection != Vector3.down)
@@ -97,7 +122,7 @@ public class SnakeController : MonoBehaviour
 
         if (!IsInsideBoard(nextPosition) || IsPositionOnBody(nextPosition))
         {
-            GameReset();
+            gameManager.GameOver();
             return;
         }
 
@@ -138,6 +163,8 @@ public class SnakeController : MonoBehaviour
 
         bodyParts.Clear();
 
+        CreateStartingBody();
+        
         gameManager.ResetScore();
         
         fruit.transform.position = fruitStartPosition;
@@ -241,6 +268,22 @@ public class SnakeController : MonoBehaviour
                IsTooCloseToHead(randomPosition));
 
         return randomPosition;
+    }
+    
+    private void CreateStartingBody()
+    {
+        for (int i = 1; i <= startingBodyParts; i++)
+        {
+            GameObject newBodyPart = Instantiate(bodyPartPrefab);
+
+            newBodyPart.transform.position =
+                startPosition + Vector3.up * i;
+
+            bodyParts.Add(newBodyPart.transform);
+        }
+
+        lastTailPosition =
+            startPosition + Vector3.up * startingBodyParts;
     }
     
 }

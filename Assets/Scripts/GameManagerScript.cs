@@ -6,15 +6,18 @@ public class GameManagerScript : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI gameOverText;
+    [SerializeField] private TextMeshProUGUI highScoreText;    
 
     private bool isGameOver = false;
     private int score = 0;
+    private int highScore = 0;
 
     private Coroutine gameOverBlinkCoroutine;
 
     private void Start()
     {
         UpdateScoreText();
+        UpdateHighScoreText();
         gameOverText.gameObject.SetActive(false);
     }
 
@@ -22,6 +25,12 @@ public class GameManagerScript : MonoBehaviour
     {
         score += amount;
         UpdateScoreText();
+
+        if (score > highScore)
+        {
+            highScore = score;
+            UpdateHighScoreText();
+        }
     }
 
     public void ResetScore()
@@ -70,5 +79,10 @@ public class GameManagerScript : MonoBehaviour
     private void UpdateScoreText()
     {
         scoreText.text = $"Score: {score}";
+    }
+    
+    private void UpdateHighScoreText()
+    {
+        highScoreText.text = $"High Score: {highScore}";
     }
 }

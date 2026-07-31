@@ -4,6 +4,8 @@ public class SnakeController : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private float timeToMove = 0.5f;
+    [SerializeField] private float speedIncrease = 0.03f;
+    [SerializeField] private float minimumTimeToMove = 0.15f;
     [SerializeField] private GameObject fruit;
 
     [SerializeField] private int width = 20;
@@ -16,8 +18,8 @@ public class SnakeController : MonoBehaviour
     
     private List<Transform> bodyParts = new List<Transform>();
     
+    private float startingTimeToMove;
     private Vector3 startPosition =  Vector3.zero;
-    private Vector3 fruitStartPosition = new Vector3(3, 2, 1);
     private Vector3 currentDirection = Vector3.zero;
     private Vector3 nextDirection = Vector3.zero;
     private Vector3 lastTailPosition = Vector3.zero;
@@ -28,7 +30,9 @@ public class SnakeController : MonoBehaviour
 
     private void Awake()
     {
+        startingTimeToMove = timeToMove;
         GameReset();
+        fruit.GetComponent<SpriteRenderer>().enabled = true;
     }
     
     private void Update()
@@ -144,6 +148,11 @@ public class SnakeController : MonoBehaviour
 
         AddBodyPart();
 
+        timeToMove = Mathf.Max(
+            minimumTimeToMove,
+            timeToMove - speedIncrease
+        );
+
         fruit.transform.position = GetRandomFruitPosition();
     }
     
@@ -155,6 +164,7 @@ public class SnakeController : MonoBehaviour
         nextDirection = Vector3.zero;
         moveTimerCounter = 0f;
         lastTailPosition = startPosition;
+        timeToMove = startingTimeToMove;
         
         foreach (Transform bodyPart in bodyParts)
         {
@@ -167,7 +177,7 @@ public class SnakeController : MonoBehaviour
         
         gameManager.ResetScore();
         
-        fruit.transform.position = fruitStartPosition;
+        fruit.transform.position = GetRandomFruitPosition();
     }
     
     private bool IsInsideBoard(Vector3 position)
@@ -258,8 +268,8 @@ public class SnakeController : MonoBehaviour
         do
         {
             randomPosition = new Vector3(
-                Random.Range(-width / 2, width / 2),
-                Random.Range(-height / 2, height / 2 + 1),
+                Random.Range(-width / 2 + 1, width / 2 - 1),
+                Random.Range(-height / 2 + 1, height / 2),
                 1
             );
         }

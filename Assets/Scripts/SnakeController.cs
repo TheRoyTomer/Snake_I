@@ -37,6 +37,17 @@ public class SnakeController : MonoBehaviour
     
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.P) &&
+            !gameManager.IsGameOver())
+        {
+            gameManager.TogglePause();
+        }
+
+        if (gameManager.IsPaused())
+        {
+            return;
+        }
+
         if (gameManager.IsGameOver())
         {
             if (Input.GetKeyDown(KeyCode.R))
